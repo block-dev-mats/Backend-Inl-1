@@ -9,6 +9,14 @@ export class Blockchain {
     this.difficulty = process.env.NODE_ENV === "test" ? 1 : 2;
   }
 
+  addBlock(block) {
+    if (!Array.isArray(this.chain)) {
+      throw new TypeError("Chain must be an array");
+    }
+
+    this.chain.push(block);
+  }
+
   getLatestBlock() {
     return this.chain[this.chain.length - 1];
   }

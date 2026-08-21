@@ -41,3 +41,40 @@ test("returns the genesis block as the latest block", () => {
 
   expect(blockchain.getLatestBlock()).toBe(blockchain.chain[0]);
 });
+
+test("adds a block to a valid chain", () => {
+  const blockchain = new Blockchain();
+  const block = new Block(
+    1,
+    new Date().toISOString(),
+    [],
+    blockchain.getLatestBlock().hash,
+  );
+
+  blockchain.addBlock(block);
+
+  expect(blockchain.chain).toHaveLength(2);
+  expect(blockchain.getLatestBlock()).toBe(block);
+});
+
+test("throws a TypeError when chain is undefined", () => {
+  const blockchain = new Blockchain();
+  const block = new Block(1, new Date().toISOString(), []);
+  blockchain.chain = undefined;
+
+  const addBlock = () => blockchain.addBlock(block);
+
+  expect(addBlock).toThrowError(TypeError);
+  expect(addBlock).toThrowError("Chain must be an array");
+});
+
+test('throws a TypeError when chain is "abc"', () => {
+  const blockchain = new Blockchain();
+  const block = new Block(1, new Date().toISOString(), []);
+  blockchain.chain = "abc";
+
+  const addBlock = () => blockchain.addBlock(block);
+
+  expect(addBlock).toThrowError(TypeError);
+  expect(addBlock).toThrowError("Chain must be an array");
+});
