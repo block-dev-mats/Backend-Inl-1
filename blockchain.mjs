@@ -37,6 +37,23 @@ export class Blockchain {
     return newBlock;
   }
 
+  isChainValid() {
+    for (let index = 1; index < this.chain.length; index += 1) {
+      const currentBlock = this.chain[index];
+      const previousBlock = this.chain[index - 1];
+
+      if (currentBlock.hash !== currentBlock.calculateHash()) {
+        return false;
+      }
+
+      if (currentBlock.previousHash !== previousBlock.hash) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   getLatestBlock() {
     return this.chain[this.chain.length - 1];
   }

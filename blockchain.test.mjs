@@ -78,6 +78,51 @@ test("uses difficulty 1 in the test environment", () => {
   expect(blockchain.difficulty).toBe(1);
 });
 
+test("returns true for a chain containing a properly mined block", () => {
+  const blockchain = new Blockchain();
+  blockchain.addTransaction({
+    sender: "Alice",
+    recipient: "Bob",
+    batchId: "batch-1",
+    weightKg: 10,
+  });
+
+  blockchain.minePendingTransactions();
+
+  expect(blockchain.isChainValid()).toBe(true);
+});
+
+test("returns false after a transaction inside a mined block is modified", () => {
+  const blockchain = new Blockchain();
+  blockchain.addTransaction({
+    sender: "Alice",
+    recipient: "Bob",
+    batchId: "batch-1",
+    weightKg: 10,
+  });
+  const minedBlock = blockchain.minePendingTransactions();
+
+  minedBlock.transactions[0].weightKg = 20;
+
+  expect(blockchain.isChainValid()).toBe(false);
+});
+
+test("returns false when a block no longer links to the preceding block", () => {
+  const blockchain = new Blockchain();
+  blockchain.addTransaction({
+    sender: "Alice",
+    recipient: "Bob",
+    batchId: "batch-1",
+    weightKg: 10,
+  });
+  const minedBlock = blockchain.minePendingTransactions();
+
+  minedBlock.previousHash = "incorrect-previous-hash";
+  minedBlock.hash = minedBlock.calculateHash();
+
+  expect(blockchain.isChainValid()).toBe(false);
+});
+
 test("returns the genesis block as the latest block", () => {
   const blockchain = new Blockchain();
 
