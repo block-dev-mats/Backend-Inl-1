@@ -53,3 +53,16 @@ test("returns the same hash for the same values", () => {
 
   expect(firstHash).toBe(secondHash);
 });
+
+test("mines a block with difficulty 1", () => {
+  const block = new Block(
+    1,
+    "2026-08-18T12:00:00.000Z",
+    [],
+    "previous-hash",
+  );
+
+  block.mineBlock(1);
+
+  expect(block.hash.startsWith("0")).toBe(true);
+});
