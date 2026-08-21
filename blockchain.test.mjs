@@ -30,6 +30,48 @@ test("starts with no pending transactions", () => {
   expect(blockchain.pendingTransactions).toEqual([]);
 });
 
+test("adds a transaction to pending transactions", () => {
+  const blockchain = new Blockchain();
+  const transaction = {
+    sender: "Alice",
+    recipient: "Bob",
+    batchId: "batch-1",
+    weightKg: 10,
+  };
+
+  blockchain.addTransaction(transaction);
+
+  expect(blockchain.pendingTransactions).toEqual([transaction]);
+});
+
+test("mines pending transactions into a new block", () => {
+  const blockchain = new Blockchain();
+  const genesisBlock = blockchain.getLatestBlock();
+  const transaction = {
+    sender: "Alice",
+    recipient: "Bob",
+    batchId: "batch-1",
+    weightKg: 10,
+  };
+
+  blockchain.addTransaction(transaction);
+  const pendingTransactions = blockchain.pendingTransactions;
+  const minedBlock = blockchain.minePendingTransactions();
+
+  expect(minedBlock).toBeInstanceOf(Block);
+  expect(minedBlock.index).toBe(1);
+  expect(minedBlock.transactions).toEqual([transaction]);
+  expect(minedBlock.transactions).toBe(pendingTransactions);
+  expect(minedBlock.previousHash).toBe(genesisBlock.hash);
+  expect(minedBlock.hash.startsWith("0".repeat(blockchain.difficulty))).toBe(
+    true,
+  );
+  expect(blockchain.getLatestBlock()).toBe(minedBlock);
+  expect(blockchain.chain).toHaveLength(2);
+  expect(blockchain.pendingTransactions).toEqual([]);
+  expect(blockchain.pendingTransactions).not.toBe(pendingTransactions);
+});
+
 test("uses difficulty 1 in the test environment", () => {
   const blockchain = new Blockchain();
 
