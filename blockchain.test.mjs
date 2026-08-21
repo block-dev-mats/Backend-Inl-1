@@ -78,6 +78,24 @@ test("uses difficulty 1 in the test environment", () => {
   expect(blockchain.difficulty).toBe(1);
 });
 
+test("uses difficulty 2 in the production environment", () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+
+  try {
+    process.env.NODE_ENV = "production";
+
+    const blockchain = new Blockchain();
+
+    expect(blockchain.difficulty).toBe(2);
+  } finally {
+    if (originalNodeEnv === undefined) {
+      delete process.env.NODE_ENV;
+    } else {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
+  }
+});
+
 test("returns true for a chain containing a properly mined block", () => {
   const blockchain = new Blockchain();
   blockchain.addTransaction({

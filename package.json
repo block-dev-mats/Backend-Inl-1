@@ -5,6 +5,7 @@
   "main": "app.mjs",
   "scripts": {
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "start": "node server.mjs"
   },
   "keywords": [],
@@ -15,6 +16,7 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.11",
     "supertest": "^7.2.2",
     "vitest": "^4.1.11"
   }
