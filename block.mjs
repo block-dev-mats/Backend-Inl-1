@@ -15,8 +15,18 @@ export class Block {
       this.index +
       this.previousHash +
       this.timestamp +
-      JSON.stringify(this.transactions);
+      JSON.stringify(this.transactions) +
+      this.nonce;
 
     return crypto.createHash("sha256").update(payload).digest("hex");
+  }
+
+  mineBlock(difficulty) {
+    const targetPrefix = "0".repeat(difficulty);
+
+    while (!this.hash.startsWith(targetPrefix)) {
+      this.nonce += 1;
+      this.hash = this.calculateHash();
+    }
   }
 }
