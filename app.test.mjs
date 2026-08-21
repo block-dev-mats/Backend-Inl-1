@@ -22,7 +22,59 @@ describe("blockchain API", () => {
     });
   });
 
-  test("POST /mine returns a block containing the accepted transaction", async () => {
+  test.each([
+    [
+      "a missing batchId",
+      { sender: "Alice", recipient: "Bob", weightKg: 10 },
+    ],
+    [
+      "an empty sender",
+      { sender: "", recipient: "Bob", batchId: "batch-1", weightKg: 10 },
+    ],
+    [
+      "an empty recipient",
+      { sender: "Alice", recipient: "", batchId: "batch-1", weightKg: 10 },
+    ],
+    [
+      "a string weightKg",
+      {
+        sender: "Alice",
+        recipient: "Bob",
+        batchId: "batch-1",
+        weightKg: "10",
+      },
+    ],
+    [
+      "a zero weightKg",
+      { sender: "Alice", recipient: "Bob", batchId: "batch-1", weightKg: 0 },
+    ],
+  ])("rejects a transaction with %s", async (description, transaction) => {
+    const app = createTestApp();
+
+    const response = await request(app).post("/transactions").send(transaction);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("error");
+  });
+
+  test("does not mine a rejected transaction", async () => {
+    const app = createTestApp();
+    const invalidTransaction = {
+      sender: "Alice",
+      recipient: "Bob",
+      weightKg: 10,
+    };
+
+    const transactionResponse = await request(app)
+      .post("/transactions")
+      .send(invalidTransaction);
+    const mineResponse = await request(app).post("/mine");
+
+    expect(transactionResponse.status).toBe(400);
+    expect(mineResponse.body.transactions).toEqual([]);
+  });
+
+  test("accepts a valid transaction and mines it", async () => {
     const app = createTestApp();
     const transaction = {
       sender: "Alice",
